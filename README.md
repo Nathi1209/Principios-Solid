@@ -14,20 +14,22 @@ Este proyecto consiste en la identificación y corrección de violaciones a los 
     3. **Infraestructura de Reportes**: Diseño y almacenamiento de archivos PDF.
 
 ### Caso 3: LSP - Liskov Substitution Principle (Modelos)
-**Diagnóstico**: `AnimalSinPeso` violaba el contrato de su clase padre al lanzar excepciones en métodos que el cliente esperaba que funcionaran, como `agregarRegistroPeso()`[cite: 172, 178].
-* **Solución**: Se reestructuró la jerarquía en `app/Models`. Ahora `Animal` es la base común y se creó `AnimalConPeso` para especializar el comportamiento de pesaje, permitiendo que el código sea sustituible sin errores.
-
+**1. Diagnóstico**: `AnimalSinPeso` violaba el contrato de su clase padre al lanzar excepciones en métodos que el cliente esperaba que funcionaran, como `agregarRegistroPeso()`[cite: 172, 178].
+* **2. Solución**: Se reestructuró la jerarquía en `app/Models`. Ahora `Animal` es la base común y se creó `AnimalConPeso` para especializar el comportamiento de pesaje, permitiendo que el código sea sustituible sin errores.
+**3.** Crear una clase base Animal (con identidad y datos generales) y una subclase o interfaz AnimalPesable que contenga el método agregarRegistroPeso(). Así, AnimalSinPeso solo heredaría de la base general.
 ### Caso 4: ISP - Interface Segregation Principle (Interfaces)
-**Diagnóstico**: La interfaz `IGestorAnimal` era una "interfaz gorda" que obligaba a clases de solo lectura a implementar métodos de escritura vacíos (stubs).
-**Solución**: Se segregó el contrato en interfaces cohesivas en `app/Contracts`: `IAnimalReader` y `IAnimalWriter`, eliminando la dependencia de métodos no utilizados.
+**1. Diagnóstico**: La interfaz `IGestorAnimal` era una "interfaz gorda" que obligaba a clases de solo lectura a implementar métodos de escritura vacíos (stubs).
+**2. Solución**: Se segregó el contrato en interfaces cohesivas en `app/Contracts`: `IAnimalReader` y `IAnimalWriter`, eliminando la dependencia de métodos no utilizados.
+**3.** Respuesta: En dos interfaces: IAnimalReader (para métodos de lectura/consultas) e IAnimalWriter (para métodos de escritura/comandos).
 
 ### Caso 5: DIP - Dependency Inversion Principle (Infraestructura)
-**Diagnóstico**: `EstimadorPesoService` dependía directamente de una URL hardcodeada y del cliente HTTP de Laravel, acoplando la lógica de negocio a detalles de infraestructura (Flask/Python).
-* **Análisis de Capas**:
+**1. Diagnóstico**: `EstimadorPesoService` dependía directamente de una URL hardcodeada y del cliente HTTP de Laravel, acoplando la lógica de negocio a detalles de infraestructura (Flask/Python).
+* **2. Análisis de Capas**:
 **Alto Nivel**: `EstimadorPesoService` (Lógica de estimación).
 **Bajo Nivel**: Cliente HTTP / Microservicio Flask.
 **Solución**: Se propone una abstracción (Interfaz) para que el servicio de alto nivel no conozca los detalles del envío HTTP, permitiendo probar la lógica sin necesidad de tener el servidor de Python activo.
-
+**3**
+IPesoEstimator o MLServiceContract
 ---
 
 ## 📂 Estructura del Código
@@ -37,5 +39,6 @@ Este proyecto consiste en la identificación y corrección de violaciones a los 
 
 ---
 **UCR - Sede Guanacaste** | Ingeniería del Software | Prof. Alonso Chavarría
+
 **Estudiantes:** Ashley Dariana Narvaez Umaña C35538
 Nathalie Tamara Caballero Jarquín C31386
