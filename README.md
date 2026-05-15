@@ -56,3 +56,22 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+
+Ficha de Análisis: Caso 1 (AnimalService.php)
+
+1. ¿Cuántos 'actores' distintos tienen razones para pedir cambios a esta clase?
+Respuesta: 3 actores. 
+
+2. Nombre los ejes de cambio (cada razón independiente para cambiar):
+Eje 1 (Lógica de Negocio): Cambios en las reglas de validación o en cómo se guarda el animal en la base de datos.  
+Eje 2 (Notificaciones): Cambios en el proveedor de correos, en el formato del mensaje o en quién recibe la notificación.  
+Eje 3 (Reportes/Infraestructura): Cambios en el diseño del PDF, la librería de generación de documentos o la ruta donde se almacenan. 
+
+3. Si tuviéramos que escribir una prueba unitaria para la validación del arete, ¿qué dependencias habría que mockear?
+Respuesta: Habría que mockear la persistencia de la base de datos (Animal::create), el servicio de correos (Mail) y el generador de PDF (Pdf/DomPDF), ya que están todos acoplados en el mismo método.  
+
+
+
+  
