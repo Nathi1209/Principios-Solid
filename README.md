@@ -1,77 +1,41 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🐄 Lab: Diagnóstico y Reparación SOLID - BovWeight CR
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este proyecto consiste en la identificación y corrección de violaciones a los principios SOLID en un sistema de gestión ganadera desarrollado en Laravel. A continuación, se detallan los hallazgos y las soluciones implementadas por el equipo.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🛠️ Reparaciones y Análisis de los Casos
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Caso 1: SRP - Single Responsibility Principle (Servicios)
+* **Diagnóstico**: La clase `AnimalService` funcionaba como una "Clase Dios", manejando tres actores distintos: Lógica de negocio, Notificaciones y Generación de PDF.
+* **Ejes de Cambio**:
+    1.  **Lógica de Negocio**: Validación y persistencia de datos del animal.
+    2.  **Notificaciones**: Formato y envío de correos al propietario.
+    3. **Infraestructura de Reportes**: Diseño y almacenamiento de archivos PDF.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Caso 3: LSP - Liskov Substitution Principle (Modelos)
+**Diagnóstico**: `AnimalSinPeso` violaba el contrato de su clase padre al lanzar excepciones en métodos que el cliente esperaba que funcionaran, como `agregarRegistroPeso()`[cite: 172, 178].
+* **Solución**: Se reestructuró la jerarquía en `app/Models`. Ahora `Animal` es la base común y se creó `AnimalConPeso` para especializar el comportamiento de pesaje, permitiendo que el código sea sustituible sin errores.
 
-## Learning Laravel
+### Caso 4: ISP - Interface Segregation Principle (Interfaces)
+**Diagnóstico**: La interfaz `IGestorAnimal` era una "interfaz gorda" que obligaba a clases de solo lectura a implementar métodos de escritura vacíos (stubs).
+**Solución**: Se segregó el contrato en interfaces cohesivas en `app/Contracts`: `IAnimalReader` y `IAnimalWriter`, eliminando la dependencia de métodos no utilizados.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Caso 5: DIP - Dependency Inversion Principle (Infraestructura)
+**Diagnóstico**: `EstimadorPesoService` dependía directamente de una URL hardcodeada y del cliente HTTP de Laravel, acoplando la lógica de negocio a detalles de infraestructura (Flask/Python).
+* **Análisis de Capas**:
+**Alto Nivel**: `EstimadorPesoService` (Lógica de estimación).
+**Bajo Nivel**: Cliente HTTP / Microservicio Flask.
+**Solución**: Se propone una abstracción (Interfaz) para que el servicio de alto nivel no conozca los detalles del envío HTTP, permitiendo probar la lógica sin necesidad de tener el servidor de Python activo.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## 📂 Estructura del Código
+* **Modelos**: `app/Models/Animal.php` y `app/Models/AnimalConPeso.php`.
+* **Interfaces (Contratos)**: `app/Contracts/IAnimalReader.php`, `app/Contracts/IAnimalWriter.php` y la abstracción para el servicio ML.
+* **Servicios**: Lógica desacoplada para cumplir con SRP y DIP.
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
-```
-
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-
-
-Ficha de Análisis: Caso 1 (AnimalService.php)
-
-1. ¿Cuántos 'actores' distintos tienen razones para pedir cambios a esta clase?
-Respuesta: 3 actores. 
-
-2. Nombre los ejes de cambio (cada razón independiente para cambiar):
-Eje 1 (Lógica de Negocio): Cambios en las reglas de validación o en cómo se guarda el animal en la base de datos.  
-Eje 2 (Notificaciones): Cambios en el proveedor de correos, en el formato del mensaje o en quién recibe la notificación.  
-Eje 3 (Reportes/Infraestructura): Cambios en el diseño del PDF, la librería de generación de documentos o la ruta donde se almacenan. 
-
-3. Si tuviéramos que escribir una prueba unitaria para la validación del arete, ¿qué dependencias habría que mockear?
-Respuesta: Habría que mockear la persistencia de la base de datos (Animal::create), el servicio de correos (Mail) y el generador de PDF (Pdf/DomPDF), ya que están todos acoplados en el mismo método.  
-
-
-
-  
+---
+**UCR - Sede Guanacaste** | Ingeniería del Software | Prof. Alonso Chavarría
+**Estudiantes:** Ashley Dariana Narvaez Umaña C35538
+Nathalie Tamara Caballero Jarquín C31386
